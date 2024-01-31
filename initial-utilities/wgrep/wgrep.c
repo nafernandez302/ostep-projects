@@ -7,13 +7,13 @@
 
 int main(int argc, char* argv[]){
     if (argc != 3){
-        printf("Error: must passed 3 arguments\n");
+        printf("wgrep: searchterm [file ...]\n");
         exit(1);
     }
     char* word = argv[1];
     FILE* fp = fopen(argv[2], "r");
     if(fp == NULL){
-        printf("Error: cannot open file\n");
+        printf("wgrep: cannot open file\n");
         exit(1);
     }
     size_t tam = N;
