@@ -9,13 +9,12 @@ int main(int argc, char* argv[]){
 	while(argc > current){
 		FILE *fp = fopen(argv[current], "r");
 		if (fp == NULL) {
-   	    printf("wcat: cannot open file %s\n", argv[current]);
+   	    printf("wcat: cannot open file\n");
             exit(1);
 		}
 		while(fgets(buffer, size , fp)){
 			printf("%s", buffer);
 		}
-		printf("\n");
 		fclose(fp);
 		current++;
 	}
