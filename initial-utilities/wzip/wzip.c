@@ -11,17 +11,19 @@ int main(int argc, char* argv[]){
     // my example: ./wzip dst src -->return src compressed into dst
 
     FILE* src = NULL;
-    FILE* dst = NULL;
 
     src = fopen(argv[1], "r");
-    dst = fopen(argv[2], "w+");
 
-    size_t bytes_long = BYTES_SIZE;
-    size_t max_size = N;
+    //size_t bytes_long = BYTES_SIZE;
+    //size_t max_size = N;
     char* buffer = malloc(N * sizeof(char));
 
-    size_t readed = fread(buffer, sizeof(char), ARRAY_SIZE(buffer), src);
+    size_t readed = fread(buffer, sizeof(char), N, src);
 
+    size_t written = fwrite(buffer, sizeof(char), N, stdout);
     printf("readed: %lu\n", readed);
+    printf("written: %lu\n", written);
+
+    fclose(src);
     return 0;
 }
