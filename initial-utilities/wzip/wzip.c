@@ -1,9 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BYTES_SIZE 4
 #define N 1024
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
+
+void write_into_stdout(char* buffer){
+    unsigned int readed_int, readed_char = 0;
+    readed_int = fwrite(buffer, sizeof(int), 1 , stdout);
+    readed_char = fwrite(buffer, sizeof(char), 1 , stdout);
+}
 
 int main(int argc, char* argv[]){
 
@@ -20,10 +26,10 @@ int main(int argc, char* argv[]){
 
     size_t readed = fread(buffer, sizeof(char), N, src);
 
-    size_t written = fwrite(buffer, sizeof(char), N, stdout);
-    printf("readed: %lu\n", readed);
-    printf("written: %lu\n", written);
+    write_into_stdout(buffer);
 
+
+    free(buffer);
     fclose(src);
     return 0;
 }
