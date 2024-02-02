@@ -6,15 +6,21 @@
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 
-void write_into_stdout(char* buffer, unsigned int size){
+int write_into_stdout(char* buffer, unsigned int size, char* last_char, int readed){
     assert(buffer!=NULL);
     unsigned int written_int = 0;
     unsigned int written_char = 0;
     unsigned int i = 0;
     unsigned int count, count_char;
     while(i < size && buffer[i] != '\0'){
-        count = 1 ;
-        count_char = buffer[i];
+        if((i == 0) && (*last_char == buffer[i]) && (readed!=0)){
+            count = readed;
+            count_char = *last_char;
+        }
+        else{
+            count = 1;
+            count_char = buffer[i];
+        }
         while((buffer[i+count-1] == buffer[i+count]) && (i + count  < size)){
             count++;
         }
@@ -32,6 +38,8 @@ void write_into_stdout(char* buffer, unsigned int size){
         //printf("written_char: %u \n", written_char);
         i = i+count;
     }
+    *last_char = (char)count_char;
+    return count;
 }
 
 int main(int argc, char* argv[]){
@@ -40,18 +48,32 @@ int main(int argc, char* argv[]){
     // my example: ./wzip dst src -->return src compressed into dst
 
     FILE* src = NULL;
-
-
+    if(argc == 1){
+        printf("wgrep: searchterm [file ...]\n");
+        exit(1);
+    }
     //size_t bytes_long = BYTES_SIZE;
     //size_t max_size = N;
     char* buffer = malloc(N * sizeof(char));
+    int last_readed;
+    char last_char;
+    
+    // LECTURA DE ARCHVOS
+    // arreglo de punteros a strings --> char**
+
+    //Inicialización
+    char** str_dir = malloc(N * sizeof(char*));
+    for(int i = 0; i < N; ++i){
+        str_dir[i] = malloc(N * sizeof(char)); //Buffers
+    }
+
 
     for(int i = 1; i<argc; i++){
         src = fopen(argv[i], "r");
-        size_t readed = fread(buffer, sizeof(char), N, src);
-        if(readed >0){
-            write_into_stdout(buffer, readed);
+        if(src == NULL){
+            printf("wgrep: cannot open file\n");
         }
+        size_t readed = fread(buffer, sizeof(char), N, src);
         fclose(src);
     }
     free(buffer);
