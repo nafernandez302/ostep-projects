@@ -51,15 +51,13 @@ int main(int argc, char* argv[]){
     FILE* src = NULL;
     FILE* dst = NULL;
     if(argc == 1){
-        printf("wgrep: searchterm [file ...]\n");
+        printf("wzip: file1 [file2 ...]\n");
         exit(1);
     }
     char buffer[N];
     char current_char, prev_char;
     int count = 1;
-    int last_readed;
     
-    dst = fopen("dst", "w+");
     // Leo el primer archivo por separado
     src = fopen(argv[1], "r");
     if(src == NULL){
@@ -67,7 +65,6 @@ int main(int argc, char* argv[]){
         exit(1);
     }
     size_t readed_prev = fread(&prev_char, 1, 1, src);
-    int i = 0;
     while(fread(&current_char, 1, 1, src) > 0){
         //printf("rep number %d\n", i);
         if(current_char != prev_char){
@@ -79,11 +76,36 @@ int main(int argc, char* argv[]){
         else{
             count++;
         }
-        i++;
+    }
+    fclose(src);
+    char last_readed = prev_char;
+
+    for(int i = 2; i<argc; i++){
+        src = fopen(argv[i], "r");
+        fread(&prev_char, 1, 1, src);
+        if(last_readed == prev_char){
+            count++;
+        }
+        else{
+            fwrite(&count, 4, 1, stdout);
+            fwrite(&prev_char, 1, 1, stdout);
+            count = 1;
+        }
+        while(fread(&current_char, 1, 1, src) > 0){
+            if(current_char != prev_char ){
+                fwrite(&count, 4, 1, stdout);
+                fwrite(&prev_char, 1, 1, stdout);
+                count = 1;
+                prev_char = current_char;
+            }
+            else{
+                count++;
+            }
+        }
+        fclose(src);
     }
     fwrite(&count, 4, 1, stdout);
     fwrite(&current_char, 1, 1, stdout);
-    fclose(src);
-    fclose(dst);
+    
     return 0;
 }
