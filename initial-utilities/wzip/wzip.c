@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #define BYTES_COMPRESSION 5
-#define N 1024
+#define MAX_ARGS 100
+#define N 4096
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 
@@ -48,34 +49,41 @@ int main(int argc, char* argv[]){
     // my example: ./wzip dst src -->return src compressed into dst
 
     FILE* src = NULL;
+    FILE* dst = NULL;
     if(argc == 1){
         printf("wgrep: searchterm [file ...]\n");
         exit(1);
     }
-    //size_t bytes_long = BYTES_SIZE;
-    //size_t max_size = N;
-    char* buffer = malloc(N * sizeof(char));
+    char buffer[N];
+    char current_char, prev_char;
+    int count = 1;
     int last_readed;
-    char last_char;
     
-    // LECTURA DE ARCHVOS
-    // arreglo de punteros a strings --> char**
-
-    //Inicialización
-    char** str_dir = malloc(N * sizeof(char*));
-    for(int i = 0; i < N; ++i){
-        str_dir[i] = malloc(N * sizeof(char)); //Buffers
+    dst = fopen("dst", "w+");
+    // Leo el primer archivo por separado
+    src = fopen(argv[1], "r");
+    if(src == NULL){
+        printf("wgrep: cannot open file\n");
+        exit(1);
     }
-
-
-    for(int i = 1; i<argc; i++){
-        src = fopen(argv[i], "r");
-        if(src == NULL){
-            printf("wgrep: cannot open file\n");
+    size_t readed_prev = fread(&prev_char, 1, 1, src);
+    int i = 0;
+    while(fread(&current_char, 1, 1, src) > 0){
+        //printf("rep number %d\n", i);
+        if(current_char != prev_char){
+            fwrite(&count, 4, 1, stdout);
+            fwrite(&prev_char, 1, 1, stdout);
+            count = 1;
+            prev_char = current_char;
         }
-        size_t readed = fread(buffer, sizeof(char), N, src);
-        fclose(src);
+        else{
+            count++;
+        }
+        i++;
     }
-    free(buffer);
+    fwrite(&count, 4, 1, stdout);
+    fwrite(&current_char, 1, 1, stdout);
+    fclose(src);
+    fclose(dst);
     return 0;
 }
